@@ -18,8 +18,23 @@ exports.createOrganization = async (req, res) => {
 
 exports.getAllOrganization = async (req, res) => {
   try {
-    const organizations = await Organization.find();
+    const organizations = await Organization.find().populate("employees");
+    res.json(organizations);
+  } catch (error) {
+    res.status(500).json({ status: "fail", messgae: error.message });
+  }
+};
+
+exports.getAllOrganizationWithUniqueValue = async (req, res) => {
+  try {
+    const organizations = await Organization.find(
+      { $or: [{ name: "Microsoft" }, { address: "No 5, USA" }] },
+      { _id: false, name: true, employees: true, address: true }
+    );
     // .populate("Employees")
+    if (organizations.length == 0) {
+      res.json("Can't Find the Document");
+    }
     res.json(organizations);
   } catch (error) {
     res.status(500).json(error);

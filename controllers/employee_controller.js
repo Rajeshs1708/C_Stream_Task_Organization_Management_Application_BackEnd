@@ -38,7 +38,18 @@ exports.createEmployee = async (req, res) => {
 
 exports.getAllEmployees = async (req, res) => {
   try {
-    const employees = await Employee.find();
+    const employees = await Employee.find().populate("organization");
+    res.json(employees);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to retrieve Employees" });
+  }
+};
+exports.getAllEmployeesWithUniqueData = async (req, res) => {
+  try {
+    const employees = await Employee.find(
+      { name: { $nin: ["Rajesh", "Manikandan"] } },
+      { _id: 0, name: 1, organization: 1 }
+    );
     res.json(employees);
   } catch (error) {
     res.status(500).json({ error: "Failed to retrieve Employees" });
@@ -54,5 +65,28 @@ exports.getSingleEmployee = async (req, res) => {
     res.json(employee);
   } catch (error) {
     res.status(500).json({ error: "Failed to retrieve Employee" });
+  }
+};
+
+exports.updateSingleEmployee = async (req, res) => {
+  try {
+    const employee = await Employee.findByIdAndUpdate(req.params.id);
+    if (!employee) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
+    res.json("Updated Successfully");
+  } catch (error) {
+    res.status(500).json({ error: "Failed to Update Employee" });
+  }
+};
+exports.deleteEmployee = async (req, res) => {
+  try {
+    const employee = await Employee.findByIdAndDelete(req.params.id);
+    if (!employee) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
+    res.json("Deleted Successfully");
+  } catch (error) {
+    res.status(500).json({ error: "Failed to Delete Employee" });
   }
 };
