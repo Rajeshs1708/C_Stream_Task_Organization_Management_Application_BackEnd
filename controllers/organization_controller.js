@@ -42,7 +42,9 @@ exports.getAllOrganizationWithUniqueValue = async (req, res) => {
 };
 exports.getSingleOrganization = async (req, res) => {
   try {
-    const organization = await Organization.findById(req.params.id);
+    const organization = await Organization.findById(req.params.id).populate(
+      "employees"
+    );
     // .populate(
     //   "Employees"
     // );
